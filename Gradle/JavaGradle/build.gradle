@@ -35,9 +35,11 @@ task runAppAgain(type: JavaExec) {
   // only works if two arguments are provided
   // Try: using default values in case non or only one parameter is provided
   if (project.hasProperty("num1") && project.hasProperty("num2")) {
-    args(project.getProperty('num1'), project.getProperty('num2'));
-  } else if (project.hasProperty("num1")){
-    args(project.getProperty('num1'), 1);
+    args(project.getProperty('num1'), project.getProperty('num2'))
+  } else if (project.hasProperty("num1")) {
+    args(project.getProperty('num1'), '1')
+  } else {
+    args('1', '2') // Default values if no arguments are provided
   }
 }
 
@@ -50,18 +52,32 @@ task runFraction(type: JavaExec) {
 
   main = 'Fraction'
 }
-
 // Try:
 // 1. Change Fraction.main so it accepts 2 arguments
 // 2. Create a new gradle tasks that accepts two arguments and 
 //    can be called as: gradle runFrac -Pdenom=4 -Pnum=3 or as gradle runFrac -Pnum=3 -Pdenom=4 , also make sure it can run with only 1 or no arguments
+task runFrac(type: JavaExec) {
+    group 'Fraction Tasks'
+    description 'Runs Fraction with default parameters or given values'
 
+    classpath = sourceSets.main.runtimeClasspath
+    main = 'Fraction'
+
+    // Argument handling for Fraction
+    if (project.hasProperty("num") && project.hasProperty("denom")) {
+        args(project.getProperty('num'), project.getProperty('denom'))
+    } else if (project.hasProperty("num")) {
+        args(project.getProperty('num'), '1') // Default denominator if only numerator is provided
+    } else {
+        args('1', '1') // Defaults if no arguments provided
+    }
+}
 // Example how you can add that libraries can be pulled from mavenCentral()
-// repositories {
-//   mavenCentral()
-// }
+repositories {
+    mavenCentral()
+}
 
 // Setting dependencies, e.g. when you import JSON in your Java files
-// dependencies{
-//   implementation 'org.json:json:20171018'
-// }
+dependencies {
+    implementation 'org.json:json:20171018'
+}
